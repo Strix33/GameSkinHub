@@ -1,10 +1,16 @@
 import { Gamepad2, User, ShoppingCart, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Cart } from './Cart';
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 
 export const Header = () => {
   const { user, signOut } = useAuth();
+  const { totalItems } = useCart();
   const navigate = useNavigate();
+  const [cartOpen, setCartOpen] = useState(false);
 
   const handleAuthClick = () => {
     if (user) {
@@ -38,12 +44,21 @@ export const Header = () => {
 
           {/* User Actions */}
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                3
-              </span>
-            </button>
+            <Dialog open={cartOpen} onOpenChange={setCartOpen}>
+              <DialogTrigger asChild>
+                <button className="relative p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
+                  <ShoppingCart className="h-5 w-5" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                      {totalItems}
+                    </span>
+                  )}
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <Cart />
+              </DialogContent>
+            </Dialog>
             
             <button className="flex items-center gap-2 gaming-btn" onClick={handleAuthClick}>
               {user ? <LogOut className="h-4 w-4" /> : <User className="h-4 w-4" />}

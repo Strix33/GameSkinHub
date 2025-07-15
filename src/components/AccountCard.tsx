@@ -1,23 +1,8 @@
 import { ShoppingCart, Star, Trophy } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-
-export interface AccountData {
-  id: string;
-  game: string;
-  title: string;
-  price: number;
-  skins: Array<{
-    name: string;
-    rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  }>;
-  bundle?: string;
-  rank?: string;
-  level?: number;
-  image: string;
-  featured?: boolean;
-}
+import { AccountData } from '@/types/database';
 
 interface AccountCardProps {
   account: AccountData;
@@ -28,6 +13,9 @@ const rarityColors = {
   rare: 'text-blue-400',
   epic: 'text-purple-400',
   legendary: 'text-yellow-400',
+  Rare: 'text-blue-400',
+  Epic: 'text-purple-400',
+  Legendary: 'text-yellow-400',
 };
 
 const rarityGlow = {
@@ -35,29 +23,45 @@ const rarityGlow = {
   rare: 'shadow-blue-500/20',
   epic: 'shadow-purple-500/20',
   legendary: 'shadow-yellow-500/20',
+  Rare: 'shadow-blue-500/20',
+  Epic: 'shadow-purple-500/20',
+  Legendary: 'shadow-yellow-500/20',
 };
 
 export const AccountCard = ({ account }: AccountCardProps) => {
   const { user } = useAuth();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const handlePurchase = () => {
+  const handleAddToCart = () => {
     if (!user) {
       navigate('/auth');
       return;
     }
-
-    // Simulate purchase
-    toast({
-      title: "Purchase Successful!",
-      description: `You have successfully purchased the ${account.title} account.`,
-    });
+    
+    addToCart(account.id);
   };
+
+  const getGameImage = (game: string) => {
+    switch (game.toLowerCase()) {
+      case 'valorant':
+        return '/valorant-skins.jpg';
+      case 'csgo':
+        return '/csgo-weapons.jpg';
+      case 'minecraft':
+        return '/minecraft-character.jpg';
+      default:
+        return '/gaming-hero.jpg';
+    }
+  };
+
   const highestRarity = account.skins.reduce((highest, skin) => {
-    const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4 };
-    return rarityOrder[skin.rarity] > rarityOrder[highest] ? skin.rarity : highest;
-  }, 'common' as const);
+    const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4, Rare: 2, Epic: 3, Legendary: 4 };
+    const skinRarity = skin.rarity?.toLowerCase() || 'common';
+    const currentOrder = rarityOrder[skinRarity as keyof typeof rarityOrder] || 1;
+    const highestOrder = rarityOrder[highest.toLowerCase() as keyof typeof rarityOrder] || 1;
+    return currentOrder > highestOrder ? skinRarity : highest;
+  }, 'common');
 
   return (
     <div className={`gaming-card group ${account.featured ? 'ring-2 ring-primary/50' : ''}`}>
@@ -75,31 +79,12 @@ export const AccountCard = ({ account }: AccountCardProps) => {
         <div 
           className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20"
           style={{
-            backgroundImage: `url(${account.image})`,
+            backgroundImage: `url(${account.image_url || getGameImage(account.game)})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        
-        {/* Rank Badge */}
-        {account.rank && (
-          <div className="absolute top-3 left-3">
-            <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
-              <Trophy className="h-3 w-3" />
-              {account.rank}
-            </div>
-          </div>
-        )}
-
-        {/* Level Badge */}
-        {account.level && (
-          <div className="absolute bottom-3 left-3">
-            <div className="bg-accent/90 text-accent-foreground px-2 py-1 rounded text-xs font-bold">
-              LVL {account.level}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Card Content */}
@@ -117,15 +102,15 @@ export const AccountCard = ({ account }: AccountCardProps) => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">Skins ({account.skins.length})</span>
-            <div className={`w-2 h-2 rounded-full ${rarityColors[highestRarity]} ${rarityGlow[highestRarity]} shadow-lg`} />
+            <div className={`w-2 h-2 rounded-full ${rarityColors[highestRarity as keyof typeof rarityColors]} ${rarityGlow[highestRarity as keyof typeof rarityGlow]} shadow-lg`} />
           </div>
           
           <div className="space-y-1 max-h-20 overflow-y-auto custom-scrollbar">
             {account.skins.slice(0, 3).map((skin, index) => (
-              <div key={index} className="flex items-center justify-between text-sm">
+              <div key={skin.id} className="flex items-center justify-between text-sm">
                 <span className="text-foreground/80 truncate">{skin.name}</span>
-                <span className={`${rarityColors[skin.rarity]} font-medium capitalize text-xs`}>
-                  {skin.rarity}
+                <span className={`${rarityColors[skin.rarity?.toLowerCase() as keyof typeof rarityColors] || rarityColors.common} font-medium capitalize text-xs`}>
+                  {skin.rarity || 'Common'}
                 </span>
               </div>
             ))}
@@ -145,11 +130,11 @@ export const AccountCard = ({ account }: AccountCardProps) => {
           </div>
           
           <button
-            onClick={handlePurchase}
+            onClick={handleAddToCart}
             className="gaming-btn flex items-center gap-2 text-sm"
           >
             <ShoppingCart className="h-4 w-4" />
-            {user ? 'Purchase' : 'Sign In'}
+            {user ? 'Add to Cart' : 'Sign In'}
           </button>
         </div>
       </div>

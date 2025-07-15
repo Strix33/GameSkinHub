@@ -1,4 +1,7 @@
 import { ShoppingCart, Star, Trophy } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 export interface AccountData {
   id: string;
@@ -18,7 +21,6 @@ export interface AccountData {
 
 interface AccountCardProps {
   account: AccountData;
-  onPurchase: (account: AccountData) => void;
 }
 
 const rarityColors = {
@@ -35,7 +37,23 @@ const rarityGlow = {
   legendary: 'shadow-yellow-500/20',
 };
 
-export const AccountCard = ({ account, onPurchase }: AccountCardProps) => {
+export const AccountCard = ({ account }: AccountCardProps) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handlePurchase = () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    // Simulate purchase
+    toast({
+      title: "Purchase Successful!",
+      description: `You have successfully purchased the ${account.title} account.`,
+    });
+  };
   const highestRarity = account.skins.reduce((highest, skin) => {
     const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4 };
     return rarityOrder[skin.rarity] > rarityOrder[highest] ? skin.rarity : highest;
@@ -127,11 +145,11 @@ export const AccountCard = ({ account, onPurchase }: AccountCardProps) => {
           </div>
           
           <button
-            onClick={() => onPurchase(account)}
+            onClick={handlePurchase}
             className="gaming-btn flex items-center gap-2 text-sm"
           >
             <ShoppingCart className="h-4 w-4" />
-            Purchase
+            {user ? 'Purchase' : 'Sign In'}
           </button>
         </div>
       </div>

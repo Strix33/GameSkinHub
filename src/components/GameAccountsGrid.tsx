@@ -122,7 +122,6 @@ export const GameAccountsGrid = ({
           >
             <AccountCard
               account={account}
-              onPurchase={handlePurchase}
             />
           </div>
         ))}

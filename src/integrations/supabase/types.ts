@@ -14,6 +14,109 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_skins: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          name: string
+          rarity: string | null
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          name: string
+          rarity?: string | null
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          rarity?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_skins_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "gaming_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cart_items: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          quantity: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          quantity?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          quantity?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "gaming_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gaming_accounts: {
+        Row: {
+          bundle: string | null
+          created_at: string
+          featured: boolean | null
+          game: string
+          id: string
+          image_url: string | null
+          price: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bundle?: string | null
+          created_at?: string
+          featured?: boolean | null
+          game: string
+          id?: string
+          image_url?: string | null
+          price: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bundle?: string | null
+          created_at?: string
+          featured?: boolean | null
+          game?: string
+          id?: string
+          image_url?: string | null
+          price?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

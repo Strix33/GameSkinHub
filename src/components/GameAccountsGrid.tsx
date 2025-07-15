@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { AccountCard, AccountData } from './AccountCard';
-import { mockAccounts } from '@/data/mockAccounts';
+import { useState, useEffect } from 'react';
+import { AccountCard } from './AccountCard';
+import { AccountData } from '@/types/database';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GameAccountsGridProps {
   activeGame: string;
@@ -17,19 +18,61 @@ export const GameAccountsGrid = ({
   priceFilter,
   skinCountFilter,
 }: GameAccountsGridProps) => {
-  const [purchasingAccount, setPurchasingAccount] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<AccountData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handlePurchase = async (account: AccountData) => {
-    setPurchasingAccount(account.id);
-    // Simulate purchase process
-    setTimeout(() => {
-      alert(`Purchase initiated for ${account.title}! 🎮`);
-      setPurchasingAccount(null);
-    }, 1000);
+  useEffect(() => {
+    fetchAccounts();
+  }, [activeGame]);
+
+  const fetchAccounts = async () => {
+    setLoading(true);
+    try {
+      const { data: accountsData, error } = await supabase
+        .from('gaming_accounts')
+        .select(`
+          id,
+          title,
+          game,
+          price,
+          bundle,
+          featured,
+          image_url,
+          account_skins (
+            id,
+            name,
+            rarity
+          )
+        `)
+        .eq('game', activeGame);
+
+      if (error) throw error;
+
+      const formattedAccounts: AccountData[] = accountsData?.map(account => ({
+        id: account.id,
+        title: account.title,
+        game: account.game,
+        price: Number(account.price),
+        bundle: account.bundle,
+        featured: account.featured,
+        image_url: account.image_url,
+        skins: account.account_skins.map(skin => ({
+          id: skin.id,
+          name: skin.name,
+          rarity: skin.rarity
+        }))
+      })) || [];
+
+      setAccounts(formattedAccounts);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Filter accounts by game
-  let filteredAccounts = mockAccounts.filter(account => account.game === activeGame);
+  // Filter accounts by game (already done in the query)
+  let filteredAccounts = accounts;
 
   // Apply search filter
   if (searchTerm) {
@@ -88,6 +131,29 @@ export const GameAccountsGrid = ({
     return 0;
   });
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, index) => (
+            <div key={index} className="gaming-card animate-pulse">
+              <div className="h-48 bg-muted rounded-t-xl"></div>
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-muted rounded w-3/4"></div>
+                <div className="h-3 bg-muted rounded w-1/2"></div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-muted rounded w-full"></div>
+                  <div className="h-3 bg-muted rounded w-5/6"></div>
+                </div>
+                <div className="h-8 bg-muted rounded w-1/3 ml-auto"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (filteredAccounts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -114,16 +180,10 @@ export const GameAccountsGrid = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredAccounts.map((account) => (
-          <div
+          <AccountCard
             key={account.id}
-            className={`transition-opacity duration-300 ${
-              purchasingAccount === account.id ? 'opacity-50' : 'opacity-100'
-            }`}
-          >
-            <AccountCard
-              account={account}
-            />
-          </div>
+            account={account}
+          />
         ))}
       </div>
     </div>

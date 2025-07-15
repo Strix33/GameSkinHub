@@ -1,6 +1,19 @@
-import { Gamepad2, User, ShoppingCart } from 'lucide-react';
+import { Gamepad2, User, ShoppingCart, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const Header = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAuthClick = () => {
+    if (user) {
+      signOut();
+    } else {
+      navigate('/auth');
+    }
+  };
+
   return (
     <header className="border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4 py-4">
@@ -32,9 +45,9 @@ export const Header = () => {
               </span>
             </button>
             
-            <button className="flex items-center gap-2 gaming-btn">
-              <User className="h-4 w-4" />
-              Sign In
+            <button className="flex items-center gap-2 gaming-btn" onClick={handleAuthClick}>
+              {user ? <LogOut className="h-4 w-4" /> : <User className="h-4 w-4" />}
+              {user ? 'Sign Out' : 'Sign In'}
             </button>
           </div>
         </div>

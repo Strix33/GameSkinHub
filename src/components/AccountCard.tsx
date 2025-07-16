@@ -4,6 +4,12 @@ import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { AccountData } from '@/types/database';
 
+// Import images
+import valorantSkins from '@/assets/valorant-skins.jpg';
+import csgoWeapons from '@/assets/csgo-weapons.jpg';
+import minecraftCharacter from '@/assets/minecraft-character.jpg';
+import gamingHero from '@/assets/gaming-hero.jpg';
+
 interface AccountCardProps {
   account: AccountData;
 }
@@ -45,13 +51,13 @@ export const AccountCard = ({ account }: AccountCardProps) => {
   const getGameImage = (game: string) => {
     switch (game.toLowerCase()) {
       case 'valorant':
-        return '/src/assets/valorant-skins.jpg';
+        return valorantSkins;
       case 'csgo':
-        return '/src/assets/csgo-weapons.jpg';
+        return csgoWeapons;
       case 'minecraft':
-        return '/src/assets/minecraft-character.jpg';
+        return minecraftCharacter;
       default:
-        return '/src/assets/gaming-hero.jpg';
+        return gamingHero;
     }
   };
 

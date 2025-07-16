@@ -45,13 +45,13 @@ export const AccountCard = ({ account }: AccountCardProps) => {
   const getGameImage = (game: string) => {
     switch (game.toLowerCase()) {
       case 'valorant':
-        return '/valorant-skins.jpg';
+        return '/src/assets/valorant-skins.jpg';
       case 'csgo':
-        return '/csgo-weapons.jpg';
+        return '/src/assets/csgo-weapons.jpg';
       case 'minecraft':
-        return '/minecraft-character.jpg';
+        return '/src/assets/minecraft-character.jpg';
       default:
-        return '/gaming-hero.jpg';
+        return '/src/assets/gaming-hero.jpg';
     }
   };
 

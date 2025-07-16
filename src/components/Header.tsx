@@ -1,6 +1,7 @@
-import { Gamepad2, User, ShoppingCart, LogOut } from 'lucide-react';
+import { Gamepad2, User, ShoppingCart, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Cart } from './Cart';
@@ -9,6 +10,7 @@ import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 export const Header = () => {
   const { user, signOut } = useAuth();
   const { totalItems } = useCart();
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -59,6 +61,16 @@ export const Header = () => {
                 <Cart />
               </DialogContent>
             </Dialog>
+            
+            {user && isAdmin && (
+              <button 
+                className="flex items-center gap-2 gaming-btn bg-red-600 hover:bg-red-700" 
+                onClick={() => navigate('/admin')}
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </button>
+            )}
             
             <button className="flex items-center gap-2 gaming-btn" onClick={handleAuthClick}>
               {user ? <LogOut className="h-4 w-4" /> : <User className="h-4 w-4" />}

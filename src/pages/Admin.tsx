@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Edit, Plus, Users, Shield, Home } from 'lucide-react';
+import { Trash2, Edit, Plus, Users, Shield, Home, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AccountData } from '@/types/database';
 
@@ -45,6 +45,23 @@ export const Admin = () => {
     image_url: '',
     featured: false
   });
+  const [skinNames, setSkinNames] = useState<string[]>(['']);
+  
+  const addSkinName = () => {
+    setSkinNames([...skinNames, '']);
+  };
+  
+  const removeSkinName = (index: number) => {
+    if (skinNames.length > 1) {
+      setSkinNames(skinNames.filter((_, i) => i !== index));
+    }
+  };
+  
+  const updateSkinName = (index: number, value: string) => {
+    const updated = [...skinNames];
+    updated[index] = value;
+    setSkinNames(updated);
+  };
 
   useEffect(() => {
     if (!roleLoading && !isAdmin) {
@@ -158,6 +175,22 @@ export const Admin = () => {
 
       if (error) throw error;
 
+      // Create skins for the account if any skin names are provided
+      const validSkinNames = skinNames.filter(name => name.trim() !== '');
+      if (validSkinNames.length > 0) {
+        const skinData = validSkinNames.map(name => ({
+          account_id: data.id,
+          name: name.trim(),
+          rarity: null
+        }));
+
+        const { error: skinsError } = await supabase
+          .from('account_skins')
+          .insert(skinData);
+
+        if (skinsError) throw skinsError;
+      }
+
       toast({
         title: "Success",
         description: "Account created successfully"
@@ -171,6 +204,7 @@ export const Admin = () => {
         image_url: '',
         featured: false
       });
+      setSkinNames(['']);
       
       fetchAccounts();
     } catch (error) {
@@ -316,6 +350,42 @@ export const Admin = () => {
                 />
                 <Label htmlFor="featured">Featured</Label>
               </div>
+              
+              <div>
+                <Label>Skin Names</Label>
+                <div className="space-y-2">
+                  {skinNames.map((skinName, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={skinName}
+                        onChange={(e) => updateSkinName(index, e.target.value)}
+                        placeholder={`Skin ${index + 1} name`}
+                      />
+                      {skinNames.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeSkinName(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addSkinName}
+                    className="w-full"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Skin
+                  </Button>
+                </div>
+              </div>
+              
               <Button onClick={handleCreateAccount} className="w-full">
                 Create Account
               </Button>

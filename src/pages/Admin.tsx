@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Edit, Plus, Users, Shield } from 'lucide-react';
+import { Trash2, Edit, Plus, Users, Shield, Home } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AccountData } from '@/types/database';
 
@@ -229,9 +229,15 @@ export const Admin = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Shield className="h-6 w-6 text-primary" />
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <Shield className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        </div>
+        <Button onClick={() => navigate('/')} variant="outline" className="flex items-center gap-2">
+          <Home className="h-4 w-4" />
+          Home
+        </Button>
       </div>
 
       <Tabs defaultValue="accounts" className="space-y-6">

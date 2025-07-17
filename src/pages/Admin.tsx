@@ -95,7 +95,7 @@ export const Admin = () => {
             .from('user_roles')
             .select('role')
             .eq('user_id', profile.user_id)
-            .single();
+            .maybeSingle();
           
           return {
             profile,

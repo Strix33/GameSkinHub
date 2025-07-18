@@ -3,6 +3,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { AccountData } from '@/types/database';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Import images
 import valorantSkins from '@/assets/valorant-skins.jpg';
@@ -38,14 +40,20 @@ export const AccountCard = ({ account }: AccountCardProps) => {
   const { user } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent opening modal when clicking add to cart
     if (!user) {
       navigate('/auth');
       return;
     }
     
     addToCart(account.id);
+  };
+
+  const handleCardClick = () => {
+    setIsModalOpen(true);
   };
 
   const getGameImage = (game: string) => {
@@ -70,7 +78,11 @@ export const AccountCard = ({ account }: AccountCardProps) => {
   }, 'common');
 
   return (
-    <div className={`gaming-card group ${account.featured ? 'ring-2 ring-primary/50' : ''}`}>
+    <>
+      <div 
+        className={`gaming-card group cursor-pointer ${account.featured ? 'ring-2 ring-primary/50' : ''}`}
+        onClick={handleCardClick}
+      >
       {account.featured && (
         <div className="absolute top-3 right-3 z-10">
           <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
@@ -145,8 +157,52 @@ export const AccountCard = ({ account }: AccountCardProps) => {
         </div>
       </div>
 
-      {/* Hover Effect Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl pointer-events-none" />
-    </div>
+        {/* Hover Effect Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl pointer-events-none" />
+      </div>
+
+      {/* Skins Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              {account.title} - All Skins ({account.skins.length})
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            {account.skins.map((skin) => (
+              <div key={skin.id} className="border rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-foreground">{skin.name}</h4>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Rarity:</span>
+                  <span className={`${rarityColors[skin.rarity?.toLowerCase() as keyof typeof rarityColors] || rarityColors.common} font-medium capitalize text-sm`}>
+                    {skin.rarity || 'Common'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex items-center justify-between pt-4 mt-4 border-t">
+            <div>
+              <span className="text-2xl font-bold text-primary">${account.price}</span>
+              <span className="text-sm text-muted-foreground ml-1">USD</span>
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCart(e);
+                setIsModalOpen(false);
+              }}
+              className="gaming-btn flex items-center gap-2"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {user ? 'Add to Cart' : 'Sign In'}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

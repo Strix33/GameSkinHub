@@ -40,7 +40,14 @@ export const Header = () => {
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <a href="#" className="text-foreground hover:text-primary transition-colors">Browse</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Sell</a>
+            {user && (
+              <button 
+                onClick={() => navigate('/sell')} 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Sell
+              </button>
+            )}
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Support</a>
           </nav>
 

@@ -147,6 +147,57 @@ export type Database = {
         }
         Relationships: []
       }
+      sell_requests: {
+        Row: {
+          amount_of_skins: number
+          checked_at: string | null
+          checker_id: string | null
+          created_at: string
+          game: string
+          game_password: string
+          game_username: string
+          id: string
+          price: number
+          skin_names: string[]
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_of_skins: number
+          checked_at?: string | null
+          checker_id?: string | null
+          created_at?: string
+          game: string
+          game_password: string
+          game_username: string
+          id?: string
+          price: number
+          skin_names: string[]
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_of_skins?: number
+          checked_at?: string | null
+          checker_id?: string | null
+          created_at?: string
+          game?: string
+          game_password?: string
+          game_username?: string
+          id?: string
+          price?: number
+          skin_names?: string[]
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

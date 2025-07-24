@@ -27,7 +27,7 @@ export const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
               <Gamepad2 className="h-6 w-6 text-white" />
             </div>
@@ -39,7 +39,7 @@ export const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="#" className="text-foreground hover:text-primary transition-colors">Browse</a>
+            <button onClick={() => navigate('/')} className="text-foreground hover:text-primary transition-colors">Browse</button>
             {user && (
               <button 
                 onClick={() => navigate('/sell')} 

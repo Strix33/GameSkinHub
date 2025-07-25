@@ -505,117 +505,15 @@ export const Admin = () => {
         </TabsContent>
 
         <TabsContent value="sell-requests" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Pending Requests - For Checkers */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-yellow-600">Pending Requests</CardTitle>
-                <p className="text-sm text-muted-foreground">Requests waiting for checker approval</p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {sellRequests.filter(req => req.status === 'pending').map((request) => (
-                    <div key={request.id} className="border rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold">{request.title}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            By: {request.profiles?.display_name || request.profiles?.email}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {request.game} • ${request.price} • {request.amount_of_skins} skins
-                          </p>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(request.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                      
-                      <div className="text-sm">
-                        <p><strong>Username:</strong> {request.game_username}</p>
-                        <p><strong>Password:</strong> {request.game_password}</p>
-                        <p><strong>Skins:</strong> {request.skin_names.join(', ')}</p>
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleUpdateSellRequest(request.id, 'approved')}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleUpdateSellRequest(request.id, 'rejected')}
-                        >
-                          Reject
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  {sellRequests.filter(req => req.status === 'pending').length === 0 && (
-                    <p className="text-muted-foreground text-center py-4">No pending requests</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Approved Requests - For Admin */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-green-600">Approved Requests</CardTitle>
-                <p className="text-sm text-muted-foreground">Checker-approved requests for admin review</p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {sellRequests.filter(req => req.status === 'approved').map((request) => (
-                    <div key={request.id} className="border rounded-lg p-4 space-y-3 bg-green-50 dark:bg-green-950/20">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold">{request.title}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            By: {request.profiles?.display_name || request.profiles?.email}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {request.game} • ${request.price} • {request.amount_of_skins} skins
-                          </p>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          Approved: {request.checked_at ? new Date(request.checked_at).toLocaleDateString() : 'N/A'}
-                        </span>
-                      </div>
-                      
-                      <div className="text-sm">
-                        <p><strong>Username:</strong> {request.game_username}</p>
-                        <p><strong>Password:</strong> {request.game_password}</p>
-                        <p><strong>Skins:</strong> {request.skin_names.join(', ')}</p>
-                      </div>
-                      
-                      <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded text-xs">
-                        ✅ Ready for admin review and listing
-                      </div>
-                    </div>
-                  ))}
-                  {sellRequests.filter(req => req.status === 'approved').length === 0 && (
-                    <p className="text-muted-foreground text-center py-4">No approved requests</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Rejected Requests */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-red-600">Rejected Requests</CardTitle>
-              <p className="text-sm text-muted-foreground">Requests that were rejected by checkers</p>
+              <CardTitle className="text-green-600">Approved Requests</CardTitle>
+              <p className="text-sm text-muted-foreground">Checker-approved requests for admin review and deletion</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {sellRequests.filter(req => req.status === 'rejected').map((request) => (
-                  <div key={request.id} className="border rounded-lg p-4 space-y-3 bg-red-50 dark:bg-red-950/20 opacity-75">
+                {sellRequests.filter(req => req.status === 'approved').map((request) => (
+                  <div key={request.id} className="border rounded-lg p-4 space-y-3 bg-green-50 dark:bg-green-950/20">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold">{request.title}</h3>
@@ -627,13 +525,55 @@ export const Admin = () => {
                         </p>
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        Rejected: {request.checked_at ? new Date(request.checked_at).toLocaleDateString() : 'N/A'}
+                        Approved: {request.checked_at ? new Date(request.checked_at).toLocaleDateString() : 'N/A'}
                       </span>
+                    </div>
+                    
+                    <div className="text-sm bg-muted p-3 rounded">
+                      <p><strong>Username:</strong> {request.game_username}</p>
+                      <p><strong>Password:</strong> {request.game_password}</p>
+                      <p><strong>Skins:</strong> {request.skin_names.join(', ')}</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded text-xs">
+                        ✅ Approved by checker
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase
+                              .from('sell_requests')
+                              .delete()
+                              .eq('id', request.id);
+
+                            if (error) {
+                              toast({
+                                title: "Error",
+                                description: "Failed to delete request",
+                                variant: "destructive",
+                              });
+                            } else {
+                              toast({
+                                title: "Success",
+                                description: "Request deleted successfully",
+                              });
+                              fetchSellRequests();
+                            }
+                          } catch (error) {
+                            console.error('Error deleting request:', error);
+                          }
+                        }}
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 ))}
-                {sellRequests.filter(req => req.status === 'rejected').length === 0 && (
-                  <p className="text-muted-foreground text-center py-4">No rejected requests</p>
+                {sellRequests.filter(req => req.status === 'approved').length === 0 && (
+                  <p className="text-muted-foreground text-center py-8">No approved requests</p>
                 )}
               </div>
             </CardContent>

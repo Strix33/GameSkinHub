@@ -49,16 +49,7 @@ export const Checker = () => {
     try {
       const { data, error } = await supabase
         .from('sell_requests')
-        .select(`
-          *,
-          profiles (
-            id,
-            user_id,
-            email,
-            display_name,
-            created_at
-          )
-        `)
+        .select('*')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -70,7 +61,7 @@ export const Checker = () => {
           variant: "destructive",
         });
       } else {
-        setRequests((data as any) || []);
+        setRequests(data || []);
       }
     } catch (error) {
       console.error('Error fetching requests:', error);

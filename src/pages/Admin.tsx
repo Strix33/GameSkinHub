@@ -161,14 +161,11 @@ export const Admin = () => {
     try {
       const { data, error } = await supabase
         .from('sell_requests')
-        .select(`
-          *,
-          profiles!inner(display_name, email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setSellRequests((data || []) as any);
+      setSellRequests(data || []);
     } catch (error) {
       console.error('Error fetching sell requests:', error);
       toast({

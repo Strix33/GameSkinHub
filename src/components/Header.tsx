@@ -1,4 +1,4 @@
-import { Gamepad2, User, ShoppingCart, LogOut, Shield } from 'lucide-react';
+import { Gamepad2, User, ShoppingCart, LogOut, Shield, ClipboardCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 export const Header = () => {
   const { user, signOut } = useAuth();
   const { totalItems } = useCart();
-  const { isAdmin } = useUserRole();
+  const { role, isAdmin, isChecker } = useUserRole();
   const navigate = useNavigate();
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -68,6 +68,16 @@ export const Header = () => {
                 <Cart />
               </DialogContent>
             </Dialog>
+            
+            {user && (isChecker || isAdmin) && (
+              <button 
+                className="flex items-center gap-2 gaming-btn bg-blue-600 hover:bg-blue-700" 
+                onClick={() => navigate('/checker')}
+              >
+                <ClipboardCheck className="h-4 w-4" />
+                Checker
+              </button>
+            )}
             
             {user && isAdmin && (
               <button 

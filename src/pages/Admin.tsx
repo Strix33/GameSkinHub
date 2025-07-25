@@ -510,26 +510,55 @@ export const Admin = () => {
             <CardContent>
               <div className="space-y-4">
                 {sellRequests.filter(req => req.status === 'approved').map((request) => (
-                  <div key={request.id} className="border rounded-lg p-4 space-y-3 bg-green-50 dark:bg-green-950/20">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold">{request.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          By: {request.profiles?.display_name || request.profiles?.email}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {request.game} • ${request.price} • {request.amount_of_skins} skins
-                        </p>
+                  <div key={request.id} className="group relative overflow-hidden border border-primary/20 rounded-xl p-6 space-y-4 bg-gradient-to-br from-primary/5 via-background to-primary/5 hover:shadow-lg transition-all duration-300 hover:border-primary/40 hover:scale-[1.02]">
+                    {/* Status Badge */}
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      APPROVED
+                    </div>
+                    
+                    <div className="flex justify-between items-start pr-20">
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-200">{request.title}</h3>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          <span>By: {request.profiles?.display_name || request.profiles?.email}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="px-3 py-1 bg-primary/10 text-primary rounded-full font-medium">
+                            {request.game.toUpperCase()}
+                          </span>
+                          <span className="font-bold text-lg text-green-600">${request.price}</span>
+                          <span className="text-muted-foreground">{request.amount_of_skins} skins</span>
+                        </div>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        Approved: {request.checked_at ? new Date(request.checked_at).toLocaleDateString() : 'N/A'}
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                        {request.checked_at ? new Date(request.checked_at).toLocaleDateString() : 'N/A'}
                       </span>
                     </div>
                     
-                    <div className="text-sm bg-muted p-3 rounded">
-                      <p><strong>Username:</strong> {request.game_username}</p>
-                      <p><strong>Password:</strong> {request.game_password}</p>
-                      <p><strong>Skins:</strong> {request.skin_names.join(', ')}</p>
+                    {/* Credentials Section */}
+                    <div className="bg-gradient-to-r from-muted/50 to-muted/30 p-4 rounded-lg border border-border/50 backdrop-blur-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div className="space-y-1">
+                          <p className="font-medium text-foreground">🎮 Username:</p>
+                          <p className="font-mono bg-background/80 px-2 py-1 rounded border text-primary">{request.game_username}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-medium text-foreground">🔐 Password:</p>
+                          <p className="font-mono bg-background/80 px-2 py-1 rounded border text-primary">{request.game_password}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 space-y-1">
+                        <p className="font-medium text-foreground">✨ Skins:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {request.skin_names.map((skin, index) => (
+                            <span key={index} className="px-2 py-1 bg-primary/20 text-primary rounded-full text-xs font-medium">
+                              {skin}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="flex items-center justify-between">

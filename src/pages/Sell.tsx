@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft, Plus, X, AlertTriangle } from 'lucide-react';
 import { Header } from '@/components/Header';
 
 export const Sell = () => {
@@ -23,10 +23,19 @@ export const Sell = () => {
     price: '',
     amount_of_skins: '',
     game_username: '',
-    game_password: ''
+    game_password: '',
+    verification_method: 'credentials',
+    google_email: '',
+    google_password: '',
+    discord_username: ''
   });
   
   const [skinNames, setSkinNames] = useState<string[]>(['']);
+
+  // Check if game requires email verification
+  const isEmailRequired = (game: string) => {
+    return game === 'valorant';
+  };
 
   const addSkinName = () => {
     setSkinNames([...skinNames, '']);
@@ -63,6 +72,26 @@ export const Sell = () => {
       return;
     }
 
+    // Additional validation for email-required games
+    if (isEmailRequired(formData.game)) {
+      if (formData.verification_method === 'email' && (!formData.google_email || !formData.google_password)) {
+        toast({
+          title: "Error",
+          description: "Please provide Google email and password for Valorant accounts",
+          variant: "destructive"
+        });
+        return;
+      }
+      if (formData.verification_method === 'discord' && !formData.discord_username) {
+        toast({
+          title: "Error",
+          description: "Please provide Discord username for verification",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
     const filteredSkinNames = skinNames.filter(name => name.trim());
     if (parseInt(formData.amount_of_skins) !== filteredSkinNames.length) {
       toast({
@@ -76,19 +105,32 @@ export const Sell = () => {
     setIsSubmitting(true);
 
     try {
+      const insertData: any = {
+        user_id: user.id,
+        title: formData.title,
+        game: formData.game,
+        price: parseFloat(formData.price),
+        amount_of_skins: parseInt(formData.amount_of_skins),
+        skin_names: filteredSkinNames,
+        game_username: formData.game_username,
+        game_password: formData.game_password,
+        status: 'pending'
+      };
+
+      // Add verification fields for email-required games
+      if (isEmailRequired(formData.game)) {
+        insertData.verification_method = formData.verification_method;
+        if (formData.verification_method === 'email') {
+          insertData.google_email = formData.google_email;
+          insertData.google_password = formData.google_password;
+        } else if (formData.verification_method === 'discord') {
+          insertData.discord_username = formData.discord_username;
+        }
+      }
+
       const { error } = await supabase
         .from('sell_requests')
-        .insert({
-          user_id: user.id,
-          title: formData.title,
-          game: formData.game,
-          price: parseFloat(formData.price),
-          amount_of_skins: parseInt(formData.amount_of_skins),
-          skin_names: filteredSkinNames,
-          game_username: formData.game_username,
-          game_password: formData.game_password,
-          status: 'pending'
-        });
+        .insert(insertData);
 
       if (error) throw error;
 
@@ -104,7 +146,11 @@ export const Sell = () => {
         price: '',
         amount_of_skins: '',
         game_username: '',
-        game_password: ''
+        game_password: '',
+        verification_method: 'credentials',
+        google_email: '',
+        google_password: '',
+        discord_username: ''
       });
       setSkinNames(['']);
 
@@ -266,6 +312,95 @@ export const Sell = () => {
                     />
                   </div>
                 </div>
+
+                {/* Verification Section for Email-Required Games */}
+                {isEmailRequired(formData.game) && (
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2 text-primary">
+                      <AlertTriangle className="h-5 w-5" />
+                      <h3 className="font-semibold">Account Verification Required</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Valorant accounts require additional verification. Choose your preferred method:
+                    </p>
+                    
+                    <div>
+                      <Label htmlFor="verification">Verification Method *</Label>
+                      <Select 
+                        value={formData.verification_method} 
+                        onValueChange={(value) => setFormData({...formData, verification_method: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="email">Google Email & Password</SelectItem>
+                          <SelectItem value="discord">Discord Username</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {formData.verification_method === 'email' && (
+                      <div className="space-y-4">
+                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                          <p className="text-sm font-medium text-amber-800">
+                            <strong>TURN OFF 2-STEP VERIFICATION OF YOUR GOOGLE ACCOUNT</strong>
+                          </p>
+                          <p className="text-xs text-amber-700 mt-1">
+                            Write email and password of your Gmail which is connected to your game account
+                          </p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="google_email">Google Email *</Label>
+                            <Input
+                              id="google_email"
+                              type="email"
+                              value={formData.google_email}
+                              onChange={(e) => setFormData({...formData, google_email: e.target.value})}
+                              placeholder="your.email@gmail.com"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="google_password">Google Password *</Label>
+                            <Input
+                              id="google_password"
+                              type="password"
+                              value={formData.google_password}
+                              onChange={(e) => setFormData({...formData, google_password: e.target.value})}
+                              placeholder="Your Google password"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.verification_method === 'discord' && (
+                      <div className="space-y-4">
+                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                          <p className="text-sm text-blue-800">
+                            If you prefer not to share your Google credentials for security reasons, 
+                            you can use Discord verification instead.
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="discord_username">Discord Username *</Label>
+                          <Input
+                            id="discord_username"
+                            value={formData.discord_username}
+                            onChange={(e) => setFormData({...formData, discord_username: e.target.value})}
+                            placeholder="username#1234"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            After submission, a checker will send you a friend request for verification
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="pt-4">
                   <Button 

@@ -151,11 +151,16 @@ export type Database = {
         Row: {
           amount_of_skins: number
           checked_at: string | null
+          checker_discord_username: string | null
           checker_id: string | null
           created_at: string
+          discord_friend_request_sent: boolean | null
+          discord_username: string | null
           game: string
           game_password: string
           game_username: string
+          google_email: string | null
+          google_password: string | null
           id: string
           price: number
           skin_names: string[]
@@ -163,15 +168,21 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          verification_method: string | null
         }
         Insert: {
           amount_of_skins: number
           checked_at?: string | null
+          checker_discord_username?: string | null
           checker_id?: string | null
           created_at?: string
+          discord_friend_request_sent?: boolean | null
+          discord_username?: string | null
           game: string
           game_password: string
           game_username: string
+          google_email?: string | null
+          google_password?: string | null
           id?: string
           price: number
           skin_names: string[]
@@ -179,15 +190,21 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          verification_method?: string | null
         }
         Update: {
           amount_of_skins?: number
           checked_at?: string | null
+          checker_discord_username?: string | null
           checker_id?: string | null
           created_at?: string
+          discord_friend_request_sent?: boolean | null
+          discord_username?: string | null
           game?: string
           game_password?: string
           game_username?: string
+          google_email?: string | null
+          google_password?: string | null
           id?: string
           price?: number
           skin_names?: string[]
@@ -195,6 +212,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          verification_method?: string | null
         }
         Relationships: []
       }

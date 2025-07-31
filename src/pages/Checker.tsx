@@ -20,6 +20,12 @@ interface SellRequest {
   game_password: string;
   status: string;
   created_at: string;
+  verification_method: string;
+  google_email?: string;
+  google_password?: string;
+  discord_username?: string;
+  checker_discord_username?: string;
+  discord_friend_request_sent?: boolean;
   profiles?: {
     display_name: string | null;
     email: string | null;
@@ -33,6 +39,7 @@ export const Checker = () => {
   const { toast } = useToast();
   const [requests, setRequests] = useState<SellRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkerDiscordUsername, setCheckerDiscordUsername] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     if (!roleLoading && !isChecker && !isAdmin) {
@@ -49,7 +56,13 @@ export const Checker = () => {
     try {
       const { data, error } = await supabase
         .from('sell_requests')
-        .select('*')
+        .select(`
+          *,
+          profiles:user_id (
+            display_name,
+            email
+          )
+        `)
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -61,7 +74,7 @@ export const Checker = () => {
           variant: "destructive",
         });
       } else {
-        setRequests(data || []);
+        setRequests((data || []) as unknown as SellRequest[]);
       }
     } catch (error) {
       console.error('Error fetching requests:', error);
@@ -72,13 +85,22 @@ export const Checker = () => {
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
+      const request = requests.find(r => r.id === requestId);
+      const updateData: any = { 
+        status: 'approved',
+        checker_id: user?.id,
+        checked_at: new Date().toISOString()
+      };
+
+      // If this is a discord verification, add checker discord username and set friend request flag
+      if (request?.verification_method === 'discord' && checkerDiscordUsername[requestId]) {
+        updateData.checker_discord_username = checkerDiscordUsername[requestId];
+        updateData.discord_friend_request_sent = true;
+      }
+
       const { error } = await supabase
         .from('sell_requests')
-        .update({ 
-          status: 'approved',
-          checker_id: user?.id,
-          checked_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', requestId);
 
       if (error) {
@@ -174,16 +196,53 @@ export const Checker = () => {
                   </span>
                 </div>
                 
-                <div className="text-sm bg-muted p-3 rounded">
+                <div className="text-sm bg-muted p-3 rounded space-y-2">
                   <p><strong>Username:</strong> {request.game_username}</p>
                   <p><strong>Password:</strong> {request.game_password}</p>
                   <p><strong>Skins:</strong> {request.skin_names.join(', ')}</p>
+                  
+                  {/* Show verification method details */}
+                  <div className="pt-2 border-t">
+                    <p><strong>Verification Method:</strong> {request.verification_method}</p>
+                    {request.verification_method === 'email' && (
+                      <>
+                        <p><strong>Google Email:</strong> {request.google_email}</p>
+                        <p><strong>Google Password:</strong> {request.google_password}</p>
+                      </>
+                    )}
+                    {request.verification_method === 'discord' && (
+                      <p><strong>Discord Username:</strong> {request.discord_username}</p>
+                    )}
+                  </div>
                 </div>
                 
+                {/* Discord username input for checker (only if verification method is discord) */}
+                {request.verification_method === 'discord' && (
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium mb-1">
+                      Checker Discord Username *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="your_discord#1234"
+                      value={checkerDiscordUsername[request.id] || ''}
+                      onChange={(e) => setCheckerDiscordUsername({
+                        ...checkerDiscordUsername,
+                        [request.id]: e.target.value
+                      })}
+                      className="w-full px-3 py-2 border rounded-md text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Enter your Discord username to send friend request to user
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                   <Button
                     size="sm"
                     onClick={() => handleAcceptRequest(request.id)}
+                    disabled={request.verification_method === 'discord' && !checkerDiscordUsername[request.id]?.trim()}
                     className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
                   >
                     <CheckCircle className="h-4 w-4" />

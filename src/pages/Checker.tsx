@@ -49,6 +49,9 @@ export const Checker = () => {
   const [checkerDiscordUsername, setCheckerDiscordUsername] = useState<{
     [key: string]: string;
   }>({});
+  const [usernameSent, setUsernameSent] = useState<{
+    [key: string]: boolean;
+  }>({});
   useEffect(() => {
     if (!roleLoading && !isChecker && !isAdmin) {
       navigate('/');
@@ -90,21 +93,17 @@ export const Checker = () => {
   };
   const handleAcceptRequest = async (requestId: string) => {
     try {
-      const request = requests.find(r => r.id === requestId);
       const updateData: any = {
         status: 'approved',
         checker_id: user?.id,
         checked_at: new Date().toISOString()
       };
 
-      // If this is a discord verification, add checker discord username and set friend request flag
-      if (request?.verification_method === 'discord' && checkerDiscordUsername[requestId]) {
-        updateData.checker_discord_username = checkerDiscordUsername[requestId];
-        updateData.discord_friend_request_sent = true;
-      }
-      const {
-        error
-      } = await supabase.from('sell_requests').update(updateData).eq('id', requestId);
+      const { error } = await supabase
+        .from('sell_requests')
+        .update(updateData)
+        .eq('id', requestId);
+
       if (error) {
         console.error('Error accepting request:', error);
         toast({
@@ -123,12 +122,46 @@ export const Checker = () => {
       console.error('Error accepting request:', error);
     }
   };
+  const handleSendUsername = async (requestId: string) => {
+    try {
+      const { error } = await supabase
+        .from('sell_requests')
+        .update({ 
+          checker_discord_username: checkerDiscordUsername[requestId],
+          discord_friend_request_sent: true 
+        })
+        .eq('id', requestId);
+
+      if (error) {
+        console.error('Error sending username:', error);
+        toast({
+          title: "Error",
+          description: "Failed to send username",
+          variant: "destructive"
+        });
+      } else {
+        setUsernameSent({
+          ...usernameSent,
+          [requestId]: true
+        });
+        toast({
+          title: "Username Sent",
+          description: "Discord username sent to user"
+        });
+        fetchPendingRequests();
+      }
+    } catch (error) {
+      console.error('Error sending username:', error);
+    }
+  };
+
   const handleDenyRequest = async (requestId: string) => {
     try {
-      // Delete the request from database
-      const {
-        error
-      } = await supabase.from('sell_requests').delete().eq('id', requestId);
+      const { error } = await supabase
+        .from('sell_requests')
+        .delete()
+        .eq('id', requestId);
+
       if (error) {
         console.error('Error denying request:', error);
         toast({
@@ -145,6 +178,11 @@ export const Checker = () => {
       }
     } catch (error) {
       console.error('Error denying request:', error);
+      toast({
+        title: "Error",
+        description: "Network error while denying request",
+        variant: "destructive"
+      });
     }
   };
   if (roleLoading || loading) {
@@ -221,10 +259,32 @@ export const Checker = () => {
                   </div>}
 
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={() => handleAcceptRequest(request.id)} disabled={request.verification_method === 'discord' && !checkerDiscordUsername[request.id]?.trim()} className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4" />
-                    Accept
-                  </Button>
+                  {request.verification_method === 'discord' ? (
+                    <>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleSendUsername(request.id)} 
+                        disabled={!checkerDiscordUsername[request.id]?.trim() || usernameSent[request.id]}
+                        className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+                      >
+                        Send Username
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleAcceptRequest(request.id)} 
+                        disabled={!usernameSent[request.id] && !request.discord_friend_request_sent}
+                        className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Accept
+                      </Button>
+                    </>
+                  ) : (
+                    <Button size="sm" onClick={() => handleAcceptRequest(request.id)} className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      Accept
+                    </Button>
+                  )}
                   <Button size="sm" variant="destructive" onClick={() => handleDenyRequest(request.id)} className="flex items-center gap-2">
                     <XCircle className="h-4 w-4" />
                     Deny

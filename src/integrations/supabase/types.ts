@@ -81,6 +81,33 @@ export type Database = {
           },
         ]
       }
+      games: {
+        Row: {
+          created_at: string
+          default_image: string | null
+          email_required: boolean
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_image?: string | null
+          email_required?: boolean
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_image?: string | null
+          email_required?: boolean
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gaming_accounts: {
         Row: {
           bundle: string | null

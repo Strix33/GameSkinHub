@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ export const Sell = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [discordNotification, setDiscordNotification] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -31,6 +32,38 @@ export const Sell = () => {
   });
   
   const [skinNames, setSkinNames] = useState<string[]>(['']);
+
+  // Check for Discord notifications on component mount
+  useEffect(() => {
+    if (user) {
+      checkForDiscordNotifications();
+    }
+  }, [user]);
+
+  const checkForDiscordNotifications = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('sell_requests')
+        .select('*')
+        .eq('user_id', user?.id)
+        .eq('status', 'approved')
+        .eq('verification_method', 'discord')
+        .eq('discord_friend_request_sent', true)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error('Error checking notifications:', error);
+        return;
+      }
+
+      if (data && data.length > 0 && data[0].checker_discord_username) {
+        setDiscordNotification(data[0].checker_discord_username);
+      }
+    } catch (error) {
+      console.error('Error checking Discord notifications:', error);
+    }
+  };
 
   // Check if game requires email verification
   const isEmailRequired = (game: string) => {
@@ -182,6 +215,32 @@ export const Sell = () => {
             </Button>
             <h1 className="text-3xl font-bold text-primary">Sell Your Account</h1>
           </div>
+
+          {/* Discord notification */}
+          {discordNotification && (
+            <Card className="mb-6 border-green-200 bg-green-50">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-green-800">
+                  <AlertTriangle className="h-5 w-5" />
+                  <div>
+                    <p className="font-semibold">Discord Friend Request Sent!</p>
+                    <p className="text-sm">
+                      <strong>{discordNotification}</strong> has sent you a Discord friend request. 
+                      Please accept the request to proceed with the verification process.
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-3"
+                  onClick={() => setDiscordNotification(null)}
+                >
+                  Dismiss
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>

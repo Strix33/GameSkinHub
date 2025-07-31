@@ -56,13 +56,7 @@ export const Checker = () => {
     try {
       const { data, error } = await supabase
         .from('sell_requests')
-        .select(`
-          *,
-          profiles:user_id (
-            display_name,
-            email
-          )
-        `)
+        .select('*')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -74,10 +68,16 @@ export const Checker = () => {
           variant: "destructive",
         });
       } else {
-        setRequests((data || []) as unknown as SellRequest[]);
+        console.log('Fetched requests:', data); // Debug log
+        setRequests(data || []);
       }
     } catch (error) {
       console.error('Error fetching requests:', error);
+      toast({
+        title: "Error", 
+        description: "Network error while fetching requests",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -185,7 +185,7 @@ export const Checker = () => {
                   <div>
                     <h3 className="font-semibold">{request.title}</h3>
                     <p className="text-sm text-muted-foreground">
-                      By: {request.profiles?.display_name || request.profiles?.email}
+                      Request ID: {request.id.slice(0, 8)}...
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {request.game} • ${request.price} • {request.amount_of_skins} skins

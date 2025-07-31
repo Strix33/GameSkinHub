@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, SortAsc } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-const games = [
-  { id: 'valorant', name: 'Valorant', color: 'text-red-400' },
-  { id: 'minecraft', name: 'Minecraft', color: 'text-green-400' },
-  { id: 'csgo', name: 'CS:GO', color: 'text-yellow-400' },
-];
+interface Game {
+  id: string;
+  name: string;
+  color: string;
+}
+
+const defaultColors = ['text-red-400', 'text-green-400', 'text-yellow-400', 'text-blue-400', 'text-purple-400', 'text-pink-400', 'text-orange-400'];
 
 interface GameNavigationProps {
   activeGame: string;
@@ -32,6 +35,39 @@ export const GameNavigation = ({
   skinCountFilter,
   onSkinCountFilterChange,
 }: GameNavigationProps) => {
+  const [games, setGames] = useState<Game[]>([]);
+
+  useEffect(() => {
+    fetchGames();
+  }, []);
+
+  const fetchGames = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .order('created_at', { ascending: true })
+        .limit(7);
+
+      if (error) throw error;
+
+      const gamesWithColors = data.map((game, index) => ({
+        id: game.name,
+        name: game.name.charAt(0).toUpperCase() + game.name.slice(1),
+        color: defaultColors[index % defaultColors.length]
+      }));
+
+      setGames(gamesWithColors);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+      // Fallback to default games
+      setGames([
+        { id: 'valorant', name: 'Valorant', color: 'text-red-400' },
+        { id: 'minecraft', name: 'Minecraft', color: 'text-green-400' },
+        { id: 'csgo', name: 'CS:GO', color: 'text-yellow-400' },
+      ]);
+    }
+  };
   return (
     <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-4 py-4">

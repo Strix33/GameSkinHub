@@ -57,6 +57,7 @@ export const Admin = () => {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [sellRequests, setSellRequests] = useState<SellRequest[]>([]);
+  const [games, setGames] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingAccount, setEditingAccount] = useState<AccountData | null>(null);
   const [newAccount, setNewAccount] = useState({
@@ -66,6 +67,11 @@ export const Admin = () => {
     bundle: '',
     image_url: '',
     featured: false
+  });
+  const [newGame, setNewGame] = useState({
+    name: '',
+    default_image: '',
+    email_required: false
   });
   const [skinNames, setSkinNames] = useState<string[]>(['']);
   
@@ -95,6 +101,7 @@ export const Admin = () => {
       fetchAccounts();
       fetchUsers();
       fetchSellRequests();
+      fetchGames();
     }
   }, [isAdmin, roleLoading, navigate]);
 
@@ -295,6 +302,92 @@ export const Admin = () => {
     }
   };
 
+  const fetchGames = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setGames(data || []);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch games",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCreateGame = async () => {
+    try {
+      if (!newGame.name.trim()) {
+        toast({
+          title: "Error",
+          description: "Game name is required",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('games')
+        .insert({
+          name: newGame.name.toLowerCase(),
+          default_image: newGame.default_image || null,
+          email_required: newGame.email_required
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Game created successfully"
+      });
+      
+      setNewGame({
+        name: '',
+        default_image: '',
+        email_required: false
+      });
+      
+      fetchGames();
+    } catch (error) {
+      console.error('Error creating game:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create game",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteGame = async (gameId: string) => {
+    try {
+      const { error } = await supabase
+        .from('games')
+        .delete()
+        .eq('id', gameId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Game deleted successfully"
+      });
+      fetchGames();
+    } catch (error) {
+      console.error('Error deleting game:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete game",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleUpdateSellRequest = async (requestId: string, status: 'approved' | 'rejected') => {
     try {
       const { error } = await supabase
@@ -346,8 +439,9 @@ export const Admin = () => {
       </div>
 
       <Tabs defaultValue="accounts" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="accounts">Gaming Accounts</TabsTrigger>
+          <TabsTrigger value="games">Game Management</TabsTrigger>
           <TabsTrigger value="sell-requests">Sell Requests</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
         </TabsList>
@@ -496,6 +590,90 @@ export const Admin = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="games" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Add New Game
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Add up to 7 games to the navigation bar
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="game-name">Game Name *</Label>
+                  <Input
+                    id="game-name"
+                    value={newGame.name}
+                    onChange={(e) => setNewGame({ ...newGame, name: e.target.value })}
+                    placeholder="e.g., Fortnite"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="default-image">Default Image URL</Label>
+                  <Input
+                    id="default-image"
+                    value={newGame.default_image}
+                    onChange={(e) => setNewGame({ ...newGame, default_image: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="email-required"
+                  checked={newGame.email_required}
+                  onChange={(e) => setNewGame({ ...newGame, email_required: e.target.checked })}
+                />
+                <Label htmlFor="email-required">Email Required for Sell Requests</Label>
+              </div>
+              
+              <Button onClick={handleCreateGame} className="w-full">
+                Add Game
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Existing Games ({games.length}/7)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {games.map((game) => (
+                  <div key={game.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h3 className="font-semibold capitalize">{game.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Email Required: {game.email_required ? 'Yes' : 'No'}
+                      </p>
+                      {game.default_image && (
+                        <p className="text-xs text-muted-foreground">
+                          Image: {game.default_image}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteGame(game.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                {games.length === 0 && (
+                  <p className="text-muted-foreground text-center py-8">No games created</p>
+                )}
               </div>
             </CardContent>
           </Card>

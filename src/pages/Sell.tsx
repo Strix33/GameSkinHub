@@ -49,25 +49,63 @@ export const Sell = () => {
         .eq('status', 'approved')
         .eq('verification_method', 'discord')
         .eq('discord_friend_request_sent', true)
-        .order('created_at', { ascending: false })
-        .limit(1);
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error checking notifications:', error);
         return;
       }
 
-      if (data && data.length > 0 && data[0].checker_discord_username) {
-        setDiscordNotification(data[0].checker_discord_username);
+      if (data && data.length > 0) {
+        // Get the latest one with checker_discord_username
+        const latestWithChecker = data.find(request => request.checker_discord_username);
+        
+        if (latestWithChecker) {
+          setDiscordNotification(latestWithChecker.checker_discord_username);
+          
+          // Delete older requests that don't have checker username or are older
+          const toDelete = data.filter(request => 
+            request.id !== latestWithChecker.id && 
+            (!request.checker_discord_username || new Date(request.created_at) < new Date(latestWithChecker.created_at))
+          );
+          
+          for (const request of toDelete) {
+            await supabase
+              .from('sell_requests')
+              .delete()
+              .eq('id', request.id);
+          }
+        }
       }
     } catch (error) {
       console.error('Error checking Discord notifications:', error);
     }
   };
 
+  const [games, setGames] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchGames();
+  }, []);
+
+  const fetchGames = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setGames(data || []);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+    }
+  };
+
   // Check if game requires email verification
   const isEmailRequired = (game: string) => {
-    return game === 'valorant';
+    const gameData = games.find(g => g.name === game);
+    return gameData?.email_required || false;
   };
 
   const addSkinName = () => {
@@ -272,12 +310,11 @@ export const Sell = () => {
                         <SelectValue placeholder="Select game" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="valorant">Valorant</SelectItem>
-                        <SelectItem value="csgo">CS:GO</SelectItem>
-                        <SelectItem value="minecraft">Minecraft</SelectItem>
-                        <SelectItem value="fortnite">Fortnite</SelectItem>
-                        <SelectItem value="pubg">PUBG</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        {games.map((game) => (
+                          <SelectItem key={game.id} value={game.name}>
+                            {game.name.charAt(0).toUpperCase() + game.name.slice(1)}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

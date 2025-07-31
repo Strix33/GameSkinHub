@@ -472,9 +472,11 @@ export const Admin = () => {
                       <SelectValue placeholder="Select game" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="valorant">Valorant</SelectItem>
-                      <SelectItem value="csgo">CS:GO</SelectItem>
-                      <SelectItem value="minecraft">Minecraft</SelectItem>
+                      {games.map((game) => (
+                        <SelectItem key={game.id} value={game.name.toLowerCase()}>
+                          {game.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export const Cart = () => {
+  const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity, totalItems, totalPrice, loading } = useCart();
 
   if (loading) {
@@ -115,7 +117,7 @@ export const Cart = () => {
           </span>
         </div>
         
-        <Button className="w-full" size="lg">
+        <Button className="w-full" size="lg" onClick={() => navigate('/checkout')}>
           Proceed to Checkout
         </Button>
       </CardContent>

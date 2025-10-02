@@ -54,16 +54,17 @@ The platform ensures that all accounts/skins go through a **3-step verification 
 
 ---
 **Screenshots**:
-Homepage:
+## 🏠 Homepage
 <img width="1893" height="858" alt="image" src="https://github.com/user-attachments/assets/c43e6bbd-c9fa-42d6-b48f-9c5aaa2d28de" />
 
 
-Checker Dashboard:
+## ✅ Checker Dashboard
 <img width="1905" height="855" alt="image" src="https://github.com/user-attachments/assets/5eaee482-353c-4373-aa30-b297605a854a" />
 
-Admin Panel:
+## 🛡️ Admin Panel
 <img width="1654" height="865" alt="image" src="https://github.com/user-attachments/assets/b7e4363c-7170-4d87-ac3a-6400026f08f7" />
 <img width="1882" height="843" alt="image" src="https://github.com/user-attachments/assets/297e2d48-2208-4cf0-aa25-84fb37beb63e" />
+
 
 
 

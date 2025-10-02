@@ -62,8 +62,8 @@ The platform ensures that all accounts/skins go through a **3-step verification 
 <img width="1905" height="855" alt="image" src="https://github.com/user-attachments/assets/5eaee482-353c-4373-aa30-b297605a854a" />
 
 ## 🛡️ Admin Panel
-<img width="1654" height="865" alt="image" src="https://github.com/user-attachments/assets/b7e4363c-7170-4d87-ac3a-6400026f08f7" />
 <img width="1882" height="843" alt="image" src="https://github.com/user-attachments/assets/297e2d48-2208-4cf0-aa25-84fb37beb63e" />
+
 
 
 

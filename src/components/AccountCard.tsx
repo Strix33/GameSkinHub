@@ -41,6 +41,7 @@ export const AccountCard = ({ account }: AccountCardProps) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent opening modal when clicking add to cart

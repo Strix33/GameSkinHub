@@ -23,16 +23,16 @@ export const Header = () => {
   };
 
   return (
-    <header className="border-b border-border/50 bg-background/80 backdrop-blur-md">
+    <header className="border-b border-border bg-background/90 backdrop-blur-md">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <Gamepad2 className="h-6 w-6 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
+              <Gamepad2 className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold neon-text">GameHub</h1>
+              <h1 className="font-display text-lg font-semibold leading-tight text-foreground">GameHub</h1>
               <p className="text-xs text-muted-foreground">Premium Gaming Accounts</p>
             </div>
           </div>
@@ -55,7 +55,7 @@ export const Header = () => {
           <div className="flex items-center gap-3">
             <Dialog open={cartOpen} onOpenChange={setCartOpen}>
               <DialogTrigger asChild>
-                <button className="relative p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
+                <button aria-label="Open cart" className="relative rounded-lg border border-border bg-secondary/50 p-2 text-foreground transition-colors hover:bg-secondary">
                   <ShoppingCart className="h-5 w-5" />
                   {totalItems > 0 && (
                     <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
@@ -71,7 +71,7 @@ export const Header = () => {
             
             {user && (isChecker || isAdmin) && (
               <button 
-                className="flex items-center gap-2 gaming-btn bg-blue-600 hover:bg-blue-700" 
+                className="gaming-btn bg-secondary text-foreground hover:bg-secondary/80 border border-border" 
                 onClick={() => navigate('/checker')}
               >
                 <ClipboardCheck className="h-4 w-4" />
@@ -81,7 +81,7 @@ export const Header = () => {
             
             {user && isAdmin && (
               <button 
-                className="flex items-center gap-2 gaming-btn bg-red-600 hover:bg-red-700" 
+                className="gaming-btn bg-destructive text-destructive-foreground hover:bg-destructive/90" 
                 onClick={() => navigate('/admin')}
               >
                 <Shield className="h-4 w-4" />
@@ -89,7 +89,7 @@ export const Header = () => {
               </button>
             )}
             
-            <button className="flex items-center gap-2 gaming-btn" onClick={handleAuthClick}>
+            <button className="gaming-btn" onClick={handleAuthClick}>
               {user ? <LogOut className="h-4 w-4" /> : <User className="h-4 w-4" />}
               {user ? 'Sign Out' : 'Sign In'}
             </button>

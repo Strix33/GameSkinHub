@@ -80,50 +80,50 @@ export const AccountCard = ({ account }: AccountCardProps) => {
   return (
     <>
       <div 
-        className={`gaming-card group cursor-pointer ${account.featured ? 'ring-2 ring-primary/50' : ''}`}
+        className={`gaming-card group h-full cursor-pointer ${account.featured ? 'border-primary/40' : ''}`}
         onClick={handleCardClick}
       >
       {account.featured && (
         <div className="absolute top-3 right-3 z-10">
-          <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+          <div className="flex items-center gap-1 rounded-full border border-primary/30 bg-background/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary backdrop-blur-sm">
             <Star className="h-3 w-3" />
-            FEATURED
+            Featured
           </div>
         </div>
       )}
 
       {/* Account Image */}
-      <div className="relative h-48 overflow-hidden rounded-t-xl">
+      <div className="relative h-44 overflow-hidden border-b border-border">
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20"
+          className="absolute inset-0 bg-secondary"
           style={{
             backgroundImage: `url(${account.image_url || getGameImage(account.game)})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
       </div>
 
       {/* Card Content */}
-      <div className="p-4 space-y-3">
+      <div className="flex flex-1 flex-col gap-3 p-5">
         <div>
-          <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+          <h3 className="line-clamp-1 font-display text-base font-semibold text-foreground transition-colors group-hover:text-primary">
             {account.title}
           </h3>
           {account.bundle && (
-            <p className="text-sm text-accent font-medium">{account.bundle}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{account.bundle}</p>
           )}
         </div>
 
         {/* Skins List */}
-        <div className="space-y-2">
+        <div className="flex-1 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-muted-foreground">Skins ({account.skins.length})</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Skins · {account.skins.length}</span>
             <div className={`w-2 h-2 rounded-full ${rarityColors[highestRarity as keyof typeof rarityColors]} ${rarityGlow[highestRarity as keyof typeof rarityGlow]} shadow-lg`} />
           </div>
           
-          <div className="space-y-1 max-h-20 overflow-y-auto custom-scrollbar">
+          <div className="space-y-1.5">
             {account.skins.slice(0, 3).map((skin, index) => (
               <div key={skin.id} className="flex items-center justify-between text-sm">
                 <span className="text-foreground/80 truncate">{skin.name}</span>
@@ -141,15 +141,15 @@ export const AccountCard = ({ account }: AccountCardProps) => {
         </div>
 
         {/* Price and Purchase */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/50">
-          <div>
-            <span className="text-2xl font-bold text-primary">${account.price}</span>
-            <span className="text-sm text-muted-foreground ml-1">USD</span>
+        <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
+          <div className="flex items-baseline gap-1">
+            <span className="font-display text-xl font-semibold text-foreground">${account.price}</span>
+            <span className="text-xs text-muted-foreground">USD</span>
           </div>
           
           <button
             onClick={handleAddToCart}
-            className="gaming-btn flex items-center gap-2 text-sm"
+            className="gaming-btn"
           >
             <ShoppingCart className="h-4 w-4" />
             {user ? 'Add to Cart' : 'Sign In'}
@@ -157,9 +157,7 @@ export const AccountCard = ({ account }: AccountCardProps) => {
         </div>
       </div>
 
-        {/* Hover Effect Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl pointer-events-none" />
-      </div>
+        </div>
 
       {/* Skins Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -186,7 +184,7 @@ export const AccountCard = ({ account }: AccountCardProps) => {
           
           <div className="flex items-center justify-between pt-4 mt-4 border-t">
             <div>
-              <span className="text-2xl font-bold text-primary">${account.price}</span>
+              <span className="font-display text-2xl font-semibold text-foreground">${account.price}</span>
               <span className="text-sm text-muted-foreground ml-1">USD</span>
             </div>
             <button
@@ -195,7 +193,7 @@ export const AccountCard = ({ account }: AccountCardProps) => {
                 handleAddToCart(e);
                 setIsModalOpen(false);
               }}
-              className="gaming-btn flex items-center gap-2"
+              className="gaming-btn"
             >
               <ShoppingCart className="h-4 w-4" />
               {user ? 'Add to Cart' : 'Sign In'}

@@ -134,7 +134,7 @@ export const GameAccountsGrid = ({
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {[...Array(8)].map((_, index) => (
             <div key={index} className="gaming-card animate-pulse">
               <div className="h-48 bg-muted rounded-t-xl"></div>
@@ -157,7 +157,7 @@ export const GameAccountsGrid = ({
   if (filteredAccounts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="text-6xl mb-4">🔍</div>
+        
         <h3 className="text-xl font-semibold text-foreground mb-2">No accounts found</h3>
         <p className="text-muted-foreground">
           Try adjusting your search or filter criteria
@@ -169,16 +169,16 @@ export const GameAccountsGrid = ({
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold neon-text mb-2">
+        <h2 className="mb-1 text-2xl font-semibold text-foreground">
           {activeGame.charAt(0).toUpperCase() + activeGame.slice(1)} Accounts
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Found {filteredAccounts.length} account{filteredAccounts.length !== 1 ? 's' : ''} 
           {searchTerm && ` matching "${searchTerm}"`}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {filteredAccounts.map((account) => (
           <AccountCard
             key={account.id}

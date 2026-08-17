@@ -69,7 +69,7 @@ export const GameNavigation = ({
     }
   };
   return (
-    <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+    <div className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="container mx-auto px-4 py-4">
         {/* Game Tabs */}
         <div className="flex justify-center mb-6">
@@ -79,26 +79,21 @@ export const GameNavigation = ({
                 key={game.id}
                 onClick={() => onGameChange(game.id)}
                 className={`
-                  px-6 py-3 rounded-md font-semibold transition-all duration-300 relative
-                  ${activeGame === game.id 
-                    ? 'bg-primary text-primary-foreground shadow-lg neon-text' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200
+                  ${activeGame === game.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                   }
                 `}
               >
-                <span className={activeGame === game.id ? game.color : ''}>
-                  {game.name}
-                </span>
-                {activeGame === game.id && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-pulse rounded-md" />
-                )}
+                <span>{game.name}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="flex flex-wrap gap-4 justify-center items-center">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Search Bar */}
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -107,7 +102,7 @@ export const GameNavigation = ({
               placeholder={`Search ${games.find(g => g.id === activeGame)?.name} skins...`}
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-10 gaming-input"
+              className="w-full gaming-input pl-10"
             />
           </div>
 
@@ -151,10 +146,10 @@ export const GameNavigation = ({
                   key={count}
                   onClick={() => onSkinCountFilterChange(skinCountFilter === count.toString() ? '' : count.toString())}
                   className={`
-                    w-8 h-8 rounded text-sm font-semibold transition-all duration-200
+                    h-8 w-8 rounded-md border text-sm font-medium transition-colors duration-200
                     ${skinCountFilter === count.toString()
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-secondary/50 text-muted-foreground hover:text-foreground'
                     }
                   `}
                 >

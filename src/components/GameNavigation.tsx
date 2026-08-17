@@ -72,8 +72,9 @@ export const GameNavigation = ({
     <div className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="container mx-auto px-4 py-4">
         {/* Game Tabs */}
-        <div className="flex justify-center mb-6">
-          <div className="flex bg-secondary/30 rounded-lg p-1 gaming-card">
+        <div className="mb-4 flex">
+          <div className="flex flex-wrap gap-1 rounded-xl border border-border bg-secondary/40 p-1">
+
             {games.map((game) => (
               <button
                 key={game.id}

@@ -231,12 +231,12 @@ export const Admin = () => {
       if (error) throw error;
 
       // Create skins for the account if any skin names are provided
-      const validSkinNames = skinNames.filter(name => name.trim() !== '');
+      const validSkinNames = skinNames.filter(skin => skin.name.trim() !== '');
       if (validSkinNames.length > 0) {
-        const skinData = validSkinNames.map(name => ({
+        const skinData = validSkinNames.map(skin => ({
           account_id: data.id,
-          name: name.trim(),
-          rarity: null
+          name: skin.name.trim(),
+          rarity: skin.rarity || 'common'
         }));
 
         const { error: skinsError } = await supabase

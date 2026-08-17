@@ -82,18 +82,18 @@ const Auth = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-            <Gamepad2 className="h-8 w-8 text-white" />
+          <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+            <Gamepad2 className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold neon-text">GameHub</h1>
+            <h1 className="text-2xl font-bold ">GameHub</h1>
             <p className="text-sm text-muted-foreground">Premium Gaming Accounts</p>
           </div>
         </div>
 
         <Card className="border-border/50 backdrop-blur-md bg-card/50">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl neon-text">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl ">Welcome Back</CardTitle>
             <CardDescription>
               Sign in to your account or create a new one
             </CardDescription>

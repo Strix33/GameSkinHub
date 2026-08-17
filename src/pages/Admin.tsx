@@ -692,7 +692,7 @@ export const Admin = () => {
                 {sellRequests.filter(req => req.status === 'approved').map((request) => (
                   <div key={request.id} className="group relative overflow-hidden border border-primary/20 rounded-xl p-6 space-y-4 bg-gradient-to-br from-primary/5 via-background to-primary/5 hover:shadow-lg transition-all duration-300 hover:border-primary/40 hover:scale-[1.02]">
                     {/* Status Badge */}
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                    <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                       <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                       APPROVED
                     </div>

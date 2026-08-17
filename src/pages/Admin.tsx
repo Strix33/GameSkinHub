@@ -259,7 +259,7 @@ export const Admin = () => {
         image_url: '',
         featured: false
       });
-      setSkinNames(['']);
+      setSkinNames([{ name: '', rarity: 'common' }]);
       
       fetchAccounts();
     } catch (error) {

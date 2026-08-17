@@ -526,15 +526,26 @@ export const Admin = () => {
               </div>
               
               <div>
-                <Label>Skin Names</Label>
+                <Label>Skins</Label>
                 <div className="space-y-2">
-                  {skinNames.map((skinName, index) => (
+                  {skinNames.map((skin, index) => (
                     <div key={index} className="flex gap-2">
                       <Input
-                        value={skinName}
+                        value={skin.name}
                         onChange={(e) => updateSkinName(index, e.target.value)}
                         placeholder={`Skin ${index + 1} name`}
                       />
+                      <Select value={skin.rarity} onValueChange={(v) => updateSkinRarity(index, v)}>
+                        <SelectTrigger className="w-36">
+                          <SelectValue placeholder="Rarity" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="common">Common</SelectItem>
+                          <SelectItem value="rare">Rare</SelectItem>
+                          <SelectItem value="epic">Epic</SelectItem>
+                          <SelectItem value="legendary">Legendary</SelectItem>
+                        </SelectContent>
+                      </Select>
                       {skinNames.length > 1 && (
                         <Button
                           type="button"

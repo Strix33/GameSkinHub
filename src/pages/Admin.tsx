@@ -73,10 +73,10 @@ export const Admin = () => {
     default_image: '',
     email_required: false
   });
-  const [skinNames, setSkinNames] = useState<string[]>(['']);
+  const [skinNames, setSkinNames] = useState<{ name: string; rarity: string }[]>([{ name: '', rarity: 'common' }]);
   
   const addSkinName = () => {
-    setSkinNames([...skinNames, '']);
+    setSkinNames([...skinNames, { name: '', rarity: 'common' }]);
   };
   
   const removeSkinName = (index: number) => {
@@ -87,7 +87,13 @@ export const Admin = () => {
   
   const updateSkinName = (index: number, value: string) => {
     const updated = [...skinNames];
-    updated[index] = value;
+    updated[index] = { ...updated[index], name: value };
+    setSkinNames(updated);
+  };
+
+  const updateSkinRarity = (index: number, value: string) => {
+    const updated = [...skinNames];
+    updated[index] = { ...updated[index], rarity: value };
     setSkinNames(updated);
   };
 

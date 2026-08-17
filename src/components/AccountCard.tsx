@@ -93,14 +93,13 @@ export const AccountCard = ({ account }: AccountCardProps) => {
       )}
 
       {/* Account Image */}
-      <div className="relative h-44 overflow-hidden border-b border-border">
-        <div 
-          className="absolute inset-0 bg-secondary"
-          style={{
-            backgroundImage: `url(${account.image_url || getGameImage(account.game)})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
+      <div className="relative h-44 overflow-hidden border-b border-border bg-secondary">
+        <img
+          src={imageFailed || !account.image_url ? getGameImage(account.game) : account.image_url}
+          alt={`${account.title} — ${account.game} account preview`}
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+          className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
       </div>
